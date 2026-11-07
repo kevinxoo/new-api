@@ -230,7 +230,6 @@ func Register(c *gin.Context) {
 		return
 	}
 	user.Username = strings.TrimSpace(user.Username)
-	user.Email = model.NormalizeEmail(user.Email)
 	if user.Username == "" {
 		common.ApiErrorT(c, "Invalid parameters")
 		return
@@ -239,8 +238,14 @@ func Register(c *gin.Context) {
 		common.ApiErrorT(c, "Invalid input {{error}}", map[string]any{"error": err.Error()})
 		return
 	}
+	email, emailErr := service.ValidateAccountEmail(user.Email)
+	if emailErr != nil {
+		writeSecurityOperationError(c, emailErr)
+		return
+	}
+	user.Email = email
 	if common.EmailVerificationEnabled {
-		if user.Email == "" || user.VerificationCode == "" {
+		if user.VerificationCode == "" {
 			common.ApiErrorT(c, "Email verification is enabled, please enter email address and verification code")
 			return
 		}
@@ -248,20 +253,16 @@ func Register(c *gin.Context) {
 			common.ApiErrorT(c, "Verification code is incorrect or has expired")
 			return
 		}
-		if err := model.EnsureEmailAvailable(user.Email, 0); err != nil {
-			if errors.Is(err, model.ErrEmailAlreadyTaken) {
-				common.ApiErrorT(c, "Email address is already in use")
-				return
-			}
-			common.ApiErrorT(c, "Database error, please contact the administrator")
+	}
+	if err := model.EnsureEmailAvailable(user.Email, 0); err != nil {
+		if errors.Is(err, model.ErrEmailAlreadyTaken) {
+			common.ApiErrorT(c, "Email address is already in use")
 			return
 		}
+		common.ApiErrorT(c, "Database error, please contact the administrator")
+		return
 	}
-	emailForExistCheck := ""
-	if common.EmailVerificationEnabled {
-		emailForExistCheck = user.Email
-	}
-	exist, err := model.CheckUserExistOrDeleted(user.Username, emailForExistCheck)
+	exist, err := model.CheckUserExistOrDeleted(user.Username, user.Email)
 	if err != nil {
 		common.ApiErrorT(c, "Database error, please contact the administrator")
 		common.SysLog(common.LogText("CheckUserExistOrDeleted error: %v", err))
@@ -277,11 +278,9 @@ func Register(c *gin.Context) {
 		Username:    user.Username,
 		Password:    user.Password,
 		DisplayName: user.Username,
+		Email:       user.Email,
 		InviterId:   inviterId,
 		Role:        common.RoleCommonUser, // 明确设置角色为普通用户
-	}
-	if common.EmailVerificationEnabled {
-		cleanUser.Email = user.Email
 	}
 	if err := cleanUser.Insert(inviterId); err != nil {
 		if errors.Is(err, model.ErrEmailAlreadyTaken) {
