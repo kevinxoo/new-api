@@ -155,8 +155,8 @@ export function HeaderNavigationSection({
   }> = [
     {
       key: 'home',
-      title: t('Home'),
-      description: t('Landing page with system overview.'),
+      title: t('Canvas'),
+      description: t('Controls the header link to the canvas provider file.'),
     },
     {
       key: 'console',

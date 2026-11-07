@@ -20,8 +20,13 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStatus } from '@/hooks/use-status'
-import { parseHeaderNavModulesFromStatus } from '@/lib/nav-modules'
+import {
+  parseHeaderNavModulesFromStatus,
+  type HeaderNavModules,
+} from '@/lib/nav-modules'
 import { useAuthStore } from '@/stores/auth-store'
+
+export const CANVAS_PROVIDER_URL = 'https://lingyuai.shop/providers/lingyuai.ts'
 
 export type TopNavLink = {
   title: string
@@ -43,62 +48,82 @@ export type TopNavLink = {
  *   about: true
  * }
  */
+export function buildTopNavLinks(input: {
+  t: (key: string) => string
+  modules: HeaderNavModules | null
+  docsLink?: string
+  isAuthed: boolean
+}): TopNavLink[] {
+  const links: TopNavLink[] = []
+  const modules = input.modules
+
+  if (modules?.home !== false) {
+    links.push({
+      title: input.t('Canvas'),
+      href: CANVAS_PROVIDER_URL,
+      external: true,
+    })
+  }
+
+  if (modules?.console !== false) {
+    links.push({ title: input.t('Console'), href: '/dashboard' })
+  }
+
+  // Pricing
+  const pricing = modules?.pricing
+  if (pricing && typeof pricing === 'object' && pricing.enabled) {
+    const requiresAuth = pricing.requireAuth && !input.isAuthed
+    links.push({
+      title: input.t('Model Square'),
+      href: '/pricing',
+      requiresAuth,
+    })
+  }
+
+  // Rankings
+  const rankings = modules?.rankings
+  if (rankings && typeof rankings === 'object' && rankings.enabled) {
+    const requiresAuth = rankings.requireAuth && !input.isAuthed
+    links.push({
+      title: input.t('Rankings'),
+      href: '/rankings',
+      requiresAuth,
+    })
+  }
+
+  // Docs (supports external links)
+  if (modules?.docs !== false) {
+    if (input.docsLink) {
+      links.push({
+        title: input.t('Docs'),
+        href: input.docsLink,
+        external: true,
+      })
+    } else {
+      links.push({ title: input.t('Docs'), href: '/docs' })
+    }
+  }
+
+  if (modules?.about !== false) {
+    links.push({ title: input.t('About'), href: '/about' })
+  }
+
+  return links
+}
+
 export function useTopNavLinks(): TopNavLink[] {
   const { t } = useTranslation()
   const { status } = useStatus()
   const { auth } = useAuthStore()
 
-  // Parse HeaderNavModules
   const modules = useMemo(() => {
     return parseHeaderNavModulesFromStatus(
       status as Record<string, unknown> | null
     )
   }, [status])
 
-  // Documentation link (may be external)
   const docsLink: string | undefined = status?.docs_link as string | undefined
-
   const isAuthed = !!auth?.user
 
-  const links: TopNavLink[] = []
-
-  // Home
-  if (modules?.home !== false) {
-    links.push({ title: t('Home'), href: '/' })
-  }
-
-  // Console -> /dashboard (new console path)
-  if (modules?.console !== false) {
-    links.push({ title: t('Console'), href: '/dashboard' })
-  }
-
-  // Pricing
-  const pricing = modules?.pricing
-  if (pricing && typeof pricing === 'object' && pricing.enabled) {
-    const requiresAuth = pricing.requireAuth && !isAuthed
-    links.push({ title: t('Model Square'), href: '/pricing', requiresAuth })
-  }
-
-  // Rankings
-  const rankings = modules?.rankings
-  if (rankings && typeof rankings === 'object' && rankings.enabled) {
-    const requiresAuth = rankings.requireAuth && !isAuthed
-    links.push({ title: t('Rankings'), href: '/rankings', requiresAuth })
-  }
-
-  // Docs (supports external links)
-  if (modules?.docs !== false) {
-    if (docsLink) {
-      links.push({ title: t('Docs'), href: docsLink, external: true })
-    } else {
-      links.push({ title: t('Docs'), href: '/docs' })
-    }
-  }
-
-  // About
-  if (modules?.about !== false) {
-    links.push({ title: t('About'), href: '/about' })
-  }
-
-  return links
+  return buildTopNavLinks({ t, modules, docsLink, isAuthed })
 }

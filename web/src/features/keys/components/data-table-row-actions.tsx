@@ -23,7 +23,7 @@ import {
   Power,
   PowerOff,
   ExternalLink,
-  ArrowRightLeft,
+  Download,
   Copy,
   Link,
   Loader2,
@@ -56,6 +56,7 @@ import { handleServerError } from '@/lib/handle-server-error'
 
 import { updateApiKeyStatus } from '../api'
 import { API_KEY_STATUS, ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants'
+import { downloadLingyuaiProvider } from '../lib/lingyuai-provider'
 import { apiKeySchema } from '../types'
 import { useApiKeys } from './api-keys-provider'
 
@@ -85,7 +86,6 @@ export function DataTableRowActions<TData>({
     setOpen,
     setCurrentRow,
     triggerRefresh,
-    setResolvedKey,
     resolveRealKey,
     loadingKeys,
   } = useApiKeys()
@@ -252,21 +252,24 @@ export function DataTableRowActions<TData>({
             <Link size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem
+          disabled={isRealKeyLoading}
           onClick={async () => {
             const realKey = await resolveRealKey(apiKey.id)
             if (!realKey) return
-            setResolvedKey(realKey)
-            setCurrentRow(apiKey)
-            setOpen('cc-switch')
+            if (!downloadLingyuaiProvider(realKey)) {
+              toast.error(t('Could not download the provider file.'))
+              return
+            }
+            toast.success(t('Downloaded lingyuai-provider.ts'))
           }}
         >
-          {t('CC Switch')}
+          {t('Export .ts')}
           <DropdownMenuShortcut>
-            <ArrowRightLeft size={16} />
+            <Download size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
+        {hasChatPresets && <DropdownMenuSeparator />}
         {hasChatPresets && (
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>{t('Chat')}</DropdownMenuSubTrigger>

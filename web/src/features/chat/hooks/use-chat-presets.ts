@@ -23,6 +23,7 @@ import { useStatus } from '@/hooks/use-status'
 
 import {
   type ChatPreset,
+  isHiddenOneClickPreset,
   parseChatConfig,
   type RawChatConfig,
 } from '../lib/chat-links'
@@ -74,7 +75,9 @@ export function useChatPresets(): {
 
   const chatPresets = useMemo(() => {
     const raw = extractChats(status)
-    return parseChatConfig(raw)
+    return parseChatConfig(raw).filter(
+      (preset) => !isHiddenOneClickPreset(preset)
+    )
   }, [status])
 
   return {

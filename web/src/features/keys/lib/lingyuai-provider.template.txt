@@ -1,0 +1,310 @@
+const rules = [
+  {
+    type: "input",
+    field: "apiKey" as const,
+    title: "API Key",
+    value: "",
+    props: { type: "password", showPassword: true, autocomplete: "off" },
+  },
+  {
+    type: "input",
+    field: "baseUrl" as const,
+    title: "接口地址",
+    value: "https://lingyuai.shop/v1",
+    props: { placeholder: "https://lingyuai.shop/v1" },
+  },
+] as const;
+
+const version = "1.2.0";
+
+type VideoTaskData = {
+  kind: "video";
+  taskId: string;
+  model: string;
+  baseUrlHash: string;
+  deadline: number;
+};
+
+function rootUrl(baseUrl: string) {
+  return baseUrl.trim().replace(/\/+$/, "");
+}
+
+function mediaUrl(input: MediaInput) {
+  if (input.type === "url") return input.url;
+  const data = input.type === "binary" ? Buffer.from(input.data).toString("base64") : input.data;
+  return data.startsWith("data:") ? data : `data:${input.mimeType};base64,${data}`;
+}
+
+function wait(signal: AbortSignal, ms: number) {
+  signal.throwIfAborted();
+  return new Promise<void>((resolve, reject) => {
+    const abort = () => {
+      clearTimeout(timer);
+      reject(signal.reason);
+    };
+    const timer = setTimeout(() => {
+      signal.removeEventListener("abort", abort);
+      resolve();
+    }, ms);
+    signal.addEventListener("abort", abort, { once: true });
+  });
+}
+
+function object(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("接口返回格式错误");
+  return value as Record<string, unknown>;
+}
+
+
+function imageAssets(payload: Record<string, unknown>): MediaAsset[] {
+  const raw = payload.data;
+  if (!Array.isArray(raw) || !raw.length) throw new Error("生图未返回图片数据");
+  const assets: MediaAsset[] = [];
+  for (const item of raw) {
+    const entry = object(item);
+    if (typeof entry.url === "string" && entry.url.trim()) {
+      assets.push({ mediaType: "image", type: "url", url: entry.url.trim() });
+      continue;
+    }
+    const encoded = typeof entry.b64_json === "string" ? entry.b64_json.trim() : "";
+    if (!encoded) continue;
+    if (encoded.startsWith("data:")) {
+      const match = encoded.match(/^data:([^;,]+);base64,([\s\S]+)$/);
+      if (match) assets.push({ mediaType: "image", type: "base64", data: match[2], mimeType: match[1] });
+      else assets.push({ mediaType: "image", type: "url", url: encoded });
+    } else {
+      assets.push({ mediaType: "image", type: "base64", data: encoded, mimeType: "image/png" });
+    }
+  }
+  if (!assets.length) throw new Error("生图未返回可用的图片地址或编码");
+  return assets;
+}
+
+function mapSize(request: VideoRequest) {
+  const ratio = typeof request.ratio === "string" ? request.ratio.trim() : "";
+  if (ratio) return ratio;
+  const resolution = typeof request.resolution === "string" ? request.resolution.trim() : "";
+  if (!resolution) return "16:9";
+  const table: Record<string, string> = {
+    "720p": "16:9",
+    "1080p": "16:9",
+    "768P": "16:9",
+    "2K": "16:9",
+  };
+  return table[resolution] || resolution;
+}
+
+async function downloadVideo(context: ProviderContext, baseUrl: string, apiKey: string, taskId: string, signal: AbortSignal): Promise<MediaAsset[]> {
+  const contentResponse = await context.tool.fetch(`${baseUrl}/videos/${encodeURIComponent(taskId)}/content`, {
+    headers: { Authorization: "Bearer " + apiKey },
+    signal,
+  });
+  if (!contentResponse.ok) {
+    throw new Error(context.tool.errorMessage?.(await contentResponse.text().catch(() => "")) || ("下载视频失败：HTTP " + contentResponse.status));
+  }
+  const bytes = new Uint8Array(await contentResponse.arrayBuffer());
+  if (!bytes.byteLength) throw new Error("下载到的视频是空的");
+  const mimeType = (contentResponse.headers.get("content-type") || "video/mp4").split(";")[0].trim() || "video/mp4";
+  return [{ mediaType: "video", type: "binary", data: bytes, mimeType }];
+}
+
+async function pollVideo(context: ProviderContext, baseUrl: string, apiKey: string, taskId: string, signal: AbortSignal): Promise<MediaAsset[]> {
+  while (true) {
+    signal.throwIfAborted();
+    const response = await context.tool.fetch(`${baseUrl}/videos/${encodeURIComponent(taskId)}`, {
+      headers: { Authorization: "Bearer " + apiKey, Accept: "application/json" },
+      signal,
+    });
+    if (!response.ok) {
+      throw new Error(context.tool.errorMessage?.(await response.text().catch(() => "")) || ("查询任务失败：HTTP " + response.status));
+    }
+    const data = object(await response.json());
+    const status = String(data.status || "").toLowerCase();
+    if (status === "completed" || status === "succeeded" || status === "success") {
+      return downloadVideo(context, baseUrl, apiKey, taskId, signal);
+    }
+    if (status === "failed" || status === "error" || status === "cancelled" || status === "canceled") {
+      const detail = context.tool.errorMessage?.(data) || "视频生成失败";
+      throw Object.assign(new Error(detail), { code: "MEDIA_TASK_FAILED" });
+    }
+    await wait(signal, 5000);
+  }
+}
+
+export default {
+  id: "lingyuai",
+  label: "灵域AI（Muse）",
+  version,
+  readme: `通过 lingyuai.shop 中转调用 Muse 文生图 / 图生图，以及文生视频 / 图生视频。
+
+使用前请在配置里填写 API Key；接口地址默认已是 https://lingyuai.shop/v1。
+
+生图（muse-image）：
+- 纯文字生成图片
+- 一张参考图 + 文字编辑（singleImage）
+- 多张参考图 + 文字生成（最多 10 张，multiReference）
+- 接口为 POST {baseUrl}/images/generations，JSON；参考图放进 images（url 或 data URL）
+
+生视频（muse-video）：
+- 纯文字生成视频
+- 一张参考图 + 文字生成视频（singleImage / startFrameOptional）
+- 多张参考图 + 文字生成视频（最多 10 张，imageReference:10）
+- 生成时走 prompt + images[] / firstFrame，不要用 multipart input_reference
+- 任务为异步排队，适配器内部会轮询直到完成并下载成片
+
+画布侧请重新导入本文件后再试。`,
+  rules,
+  models: [
+    {
+      id: "muse-video",
+      label: "Muse 视频",
+      type: "video",
+      mode: ["text", "singleImage", "startFrameOptional", ["imageReference:10"]],
+      audio: false,
+      durationResolutionMap: [
+        {
+          duration: [5, 10],
+          resolution: ["16:9", "9:16", "1:1"],
+        },
+      ],
+    },
+    {
+      id: "muse-image",
+      label: "Muse 生图",
+      type: "image",
+      mode: ["text", "singleImage", "multiReference"],
+      imageRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
+    },
+  ] satisfies ProviderModel[],
+  async generateImage(request: ImageRequest): Promise<MediaAsset[]> {
+    const apiKey = this.config.apiKey?.trim();
+    if (!apiKey) throw new Error("请填写 API Key");
+    const baseUrl = rootUrl(this.config.baseUrl?.trim() || "https://lingyuai.shop/v1");
+    if (!request.prompt?.trim()) throw new Error("请填写提示词");
+    if (request.model !== "muse-image") throw new Error("当前仅支持模型 muse-image");
+    if (request.mask) throw new Error("当前模型不支持蒙版编辑");
+
+    const refs: MediaInput[] = [];
+    for (const image of request.images || []) refs.push(image);
+    if (refs.length > 10) throw new Error("当前模型最多使用 10 张参考图");
+
+    const body: Record<string, unknown> = {
+      model: request.model,
+      prompt: request.prompt.trim(),
+      n: typeof request.n === "number" && Number.isFinite(request.n) && request.n > 0 ? Math.round(request.n) : 1,
+      response_format: "url",
+    };
+    const size = typeof request.size === "string" ? request.size.trim() : "";
+    const ratio = typeof request.ratio === "string" ? request.ratio.trim() : "";
+    if (size) body.size = size;
+    if (ratio) {
+      body.aspect_ratio = ratio;
+      if (!size) body.size = ratio;
+    }
+    if (refs.length) {
+      body.images = refs.map((image) => ({ url: mediaUrl(image) }));
+    }
+
+    const signal = AbortSignal.any([AbortSignal.timeout(10 * 60_000), ...(this.signal ? [this.signal] : [])]);
+    const response = await this.tool.fetch(baseUrl + "/images/generations", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + apiKey,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+      signal,
+    });
+    if (!response.ok) {
+      throw new Error(this.tool.errorMessage?.(await response.text().catch(() => "")) || ("生图失败：HTTP " + response.status));
+    }
+    return imageAssets(object(await response.json()));
+  },
+  async generateVideo(request: VideoRequest): Promise<MediaAsset[]> {
+    const apiKey = this.config.apiKey?.trim();
+    if (!apiKey) throw new Error("请填写 API Key");
+    const baseUrl = rootUrl(this.config.baseUrl?.trim() || "https://lingyuai.shop/v1");
+    if (!request.prompt?.trim()) throw new Error("请填写提示词");
+    if (request.model !== "muse-video") throw new Error("当前仅支持模型 muse-video");
+    if (request.videos?.length || request.audios?.length || request.lastFrame) {
+      throw new Error("当前模型不支持参考视频、参考音频或尾帧");
+    }
+    if (request.mode === "startEndRequired" || request.mode === "endFrameOptional") {
+      throw new Error("当前模型不支持强制首尾帧模式，请用单图、首帧可选或多图参考");
+    }
+    if (Array.isArray(request.mode)) {
+      const bad = request.mode.find((item) => typeof item !== "string" || !/^imageReference:\d+$/.test(item));
+      if (bad !== undefined) throw new Error("当前模型仅支持图片参考（imageReference），不支持视频/音频参考");
+    }
+
+    const refs: MediaInput[] = [];
+    if (request.firstFrame) refs.push(request.firstFrame);
+    for (const image of request.images || []) refs.push(image);
+    if (refs.length > 10) throw new Error("当前模型最多使用 10 张参考图");
+
+    const body: Record<string, unknown> = {
+      model: request.model,
+      prompt: request.prompt.trim(),
+      size: mapSize(request),
+    };
+    if (typeof request.duration === "number" && Number.isFinite(request.duration) && request.duration > 0) {
+      body.duration = Math.round(request.duration);
+      body.seconds = String(Math.round(request.duration));
+    } else {
+      body.duration = 5;
+      body.seconds = "5";
+    }
+    // muse2api / plugin 只吃 images[]；勿再附 input_reference，否则同一张会被算两次。
+    if (refs.length) {
+      body.images = refs.map((image) => ({ url: mediaUrl(image) }));
+    }
+
+    // ACT: 单次生成最多等待 20 分钟（含排队与出片）。
+    const signal = AbortSignal.any([AbortSignal.timeout(20 * 60_000), ...(this.signal ? [this.signal] : [])]);
+    const submitResponse = await this.tool.fetch(baseUrl + "/videos", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + apiKey,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+      signal,
+    });
+    if (!submitResponse.ok) {
+      throw new Error(this.tool.errorMessage?.(await submitResponse.text().catch(() => "")) || ("提交任务失败：HTTP " + submitResponse.status));
+    }
+    const submitData = object(await submitResponse.json());
+    const taskId = submitData.id || submitData.task_id;
+    if (typeof taskId !== "string" || !taskId.trim()) throw new Error("提交任务未返回任务 ID");
+
+    await this.saveTaskData?.({
+      kind: "video",
+      taskId: String(taskId),
+      model: request.model,
+      baseUrlHash: String(this.tool.hash(baseUrl)),
+      deadline: Date.now() + 20 * 60_000,
+    } satisfies VideoTaskData);
+
+    return pollVideo(this, baseUrl, apiKey, String(taskId), signal);
+  },
+  async resumeTask(data: ProviderTaskData): Promise<MediaAsset[]> {
+    const baseUrl = rootUrl(this.config.baseUrl?.trim() || "https://lingyuai.shop/v1");
+    if (
+      data.kind !== "video"
+      || typeof data.taskId !== "string"
+      || !data.taskId
+      || typeof data.model !== "string"
+      || data.baseUrlHash !== String(this.tool.hash(baseUrl))
+      || typeof data.deadline !== "number"
+      || !Number.isFinite(data.deadline)
+    ) {
+      throw new Error("视频任务恢复数据无效或接口地址已变更");
+    }
+    const apiKey = this.config.apiKey?.trim();
+    if (!apiKey) throw new Error("请填写 API Key");
+    const signal = AbortSignal.any([AbortSignal.timeout(20 * 60_000), ...(this.signal ? [this.signal] : [])]);
+    return pollVideo(this, baseUrl, apiKey, data.taskId, signal);
+  },
+} satisfies ProviderDefinition<typeof rules>;
