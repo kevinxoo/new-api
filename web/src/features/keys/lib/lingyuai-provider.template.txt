@@ -15,7 +15,7 @@ const rules = [
   },
 ] as const;
 
-const version = "1.1.1";
+const version = "1.2.0";
 
 type VideoTaskData = {
   kind: "video";
@@ -53,6 +53,31 @@ function wait(signal: AbortSignal, ms: number) {
 function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("接口返回格式错误");
   return value as Record<string, unknown>;
+}
+
+
+function imageAssets(payload: Record<string, unknown>): MediaAsset[] {
+  const raw = payload.data;
+  if (!Array.isArray(raw) || !raw.length) throw new Error("生图未返回图片数据");
+  const assets: MediaAsset[] = [];
+  for (const item of raw) {
+    const entry = object(item);
+    if (typeof entry.url === "string" && entry.url.trim()) {
+      assets.push({ mediaType: "image", type: "url", url: entry.url.trim() });
+      continue;
+    }
+    const encoded = typeof entry.b64_json === "string" ? entry.b64_json.trim() : "";
+    if (!encoded) continue;
+    if (encoded.startsWith("data:")) {
+      const match = encoded.match(/^data:([^;,]+);base64,([\s\S]+)$/);
+      if (match) assets.push({ mediaType: "image", type: "base64", data: match[2], mimeType: match[1] });
+      else assets.push({ mediaType: "image", type: "url", url: encoded });
+    } else {
+      assets.push({ mediaType: "image", type: "base64", data: encoded, mimeType: "image/png" });
+    }
+  }
+  if (!assets.length) throw new Error("生图未返回可用的图片地址或编码");
+  return assets;
 }
 
 function mapSize(request: VideoRequest) {
@@ -108,19 +133,26 @@ async function pollVideo(context: ProviderContext, baseUrl: string, apiKey: stri
 
 export default {
   id: "lingyuai",
-  label: "灵域AI（Muse 视频）",
+  label: "灵域AI（Muse）",
   version,
-  readme: `通过 lingyuai.shop 中转调用 Muse 文生视频 / 图生视频。
+  readme: `通过 lingyuai.shop 中转调用 Muse 文生图 / 图生图，以及文生视频 / 图生视频。
 
 使用前请在配置里填写 API Key；接口地址默认已是 https://lingyuai.shop/v1。
 
-支持：
+生图（muse-image）：
+- 纯文字生成图片
+- 一张参考图 + 文字编辑（singleImage）
+- 多张参考图 + 文字生成（最多 10 张，multiReference）
+- 接口为 POST {baseUrl}/images/generations，JSON；参考图放进 images（url 或 data URL）
+
+生视频（muse-video）：
 - 纯文字生成视频
 - 一张参考图 + 文字生成视频（singleImage / startFrameOptional）
 - 多张参考图 + 文字生成视频（最多 10 张，imageReference:10）
+- 生成时走 prompt + images[] / firstFrame，不要用 multipart input_reference
+- 任务为异步排队，适配器内部会轮询直到完成并下载成片
 
-画布侧请重新导入本文件后再试。生成时走 prompt + images[] / firstFrame，不要用 multipart input_reference。
-说明：任务为异步排队，适配器内部会轮询直到完成并下载成片。`,
+画布侧请重新导入本文件后再试。`,
   rules,
   models: [
     {
@@ -136,7 +168,59 @@ export default {
         },
       ],
     },
+    {
+      id: "muse-image",
+      label: "Muse 生图",
+      type: "image",
+      mode: ["text", "singleImage", "multiReference"],
+      imageRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
+    },
   ] satisfies ProviderModel[],
+  async generateImage(request: ImageRequest): Promise<MediaAsset[]> {
+    const apiKey = this.config.apiKey?.trim();
+    if (!apiKey) throw new Error("请填写 API Key");
+    const baseUrl = rootUrl(this.config.baseUrl?.trim() || "https://lingyuai.shop/v1");
+    if (!request.prompt?.trim()) throw new Error("请填写提示词");
+    if (request.model !== "muse-image") throw new Error("当前仅支持模型 muse-image");
+    if (request.mask) throw new Error("当前模型不支持蒙版编辑");
+
+    const refs: MediaInput[] = [];
+    for (const image of request.images || []) refs.push(image);
+    if (refs.length > 10) throw new Error("当前模型最多使用 10 张参考图");
+
+    const body: Record<string, unknown> = {
+      model: request.model,
+      prompt: request.prompt.trim(),
+      n: typeof request.n === "number" && Number.isFinite(request.n) && request.n > 0 ? Math.round(request.n) : 1,
+      response_format: "url",
+    };
+    const size = typeof request.size === "string" ? request.size.trim() : "";
+    const ratio = typeof request.ratio === "string" ? request.ratio.trim() : "";
+    if (size) body.size = size;
+    if (ratio) {
+      body.aspect_ratio = ratio;
+      if (!size) body.size = ratio;
+    }
+    if (refs.length) {
+      body.images = refs.map((image) => ({ url: mediaUrl(image) }));
+    }
+
+    const signal = AbortSignal.any([AbortSignal.timeout(10 * 60_000), ...(this.signal ? [this.signal] : [])]);
+    const response = await this.tool.fetch(baseUrl + "/images/generations", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + apiKey,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+      signal,
+    });
+    if (!response.ok) {
+      throw new Error(this.tool.errorMessage?.(await response.text().catch(() => "")) || ("生图失败：HTTP " + response.status));
+    }
+    return imageAssets(object(await response.json()));
+  },
   async generateVideo(request: VideoRequest): Promise<MediaAsset[]> {
     const apiKey = this.config.apiKey?.trim();
     if (!apiKey) throw new Error("请填写 API Key");

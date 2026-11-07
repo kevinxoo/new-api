@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import templateSource from './lingyuai-provider.template.txt?raw'
 
-// Public provider snapshot (https://lingyuai.shop/providers/lingyuai.ts, v1.1.1).
+// Public provider snapshot (https://lingyuai.shop/providers/lingyuai.ts, v1.2.0).
 // apiKey and baseUrl are filled in the browser at download time. Never commit a real key.
 export const LINGYUAI_PROVIDER_TEMPLATE = templateSource
 
