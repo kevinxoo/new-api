@@ -216,6 +216,58 @@ export function RechargeFormCard({
       }
       contentClassName='space-y-4 sm:space-y-6'
     >
+      {redemptionEnabled ? (
+        <div className='space-y-2.5 sm:space-y-3'>
+          <div className='flex items-center gap-2'>
+            <IconBadge tone='warning' size='sm'>
+              <Gift />
+            </IconBadge>
+            <Label htmlFor='redemption-code' className='text-sm font-semibold'>
+              {t('Have a Code?')}
+            </Label>
+          </div>
+          <div className='grid grid-cols-[minmax(0,1fr)_auto] gap-2'>
+            <Input
+              id='redemption-code'
+              value={redemptionCode}
+              onChange={(e) => onRedemptionCodeChange(e.target.value)}
+              placeholder={t('Enter your redemption code')}
+              className='h-10 min-w-0'
+            />
+            <Button
+              onClick={onRedeem}
+              disabled={redeeming}
+              className='h-10 px-4'
+            >
+              {redeeming && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+              {t('Redeem')}
+            </Button>
+          </div>
+          {topupLink && (
+            <p className='text-muted-foreground text-xs'>
+              {t('Need a redemption code?')}{' '}
+              <a
+                href={topupLink}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='inline-flex items-center gap-1 underline-offset-4 hover:underline'
+              >
+                {t('Get one here')}
+                <ExternalLink className='h-3 w-3' />
+              </a>
+            </p>
+          )}
+        </div>
+      ) : (
+        <Alert>
+          <AlertDescription>
+            {t(
+              'Redemption codes are disabled until the administrator confirms compliance terms.'
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Online Topup Section */}
       {hasAnyTopup ? (
         <div className='space-y-4 sm:space-y-6'>
@@ -513,62 +565,6 @@ export function RechargeFormCard({
           </div>
         )}
 
-      {/* Redemption Code Section */}
-      {redemptionEnabled ? (
-        <div className='space-y-2.5 border-t pt-4 sm:space-y-3 sm:pt-6'>
-          <div className='flex items-center gap-2'>
-            <IconBadge tone='warning' size='xs'>
-              <Gift />
-            </IconBadge>
-            <Label
-              htmlFor='redemption-code'
-              className='text-muted-foreground text-xs font-medium tracking-wider uppercase'
-            >
-              {t('Have a Code?')}
-            </Label>
-          </div>
-          <div className='grid grid-cols-[minmax(0,1fr)_auto] gap-2'>
-            <Input
-              id='redemption-code'
-              value={redemptionCode}
-              onChange={(e) => onRedemptionCodeChange(e.target.value)}
-              placeholder={t('Enter your redemption code')}
-              className='h-9 min-w-0'
-            />
-            <Button
-              onClick={onRedeem}
-              disabled={redeeming}
-              variant='outline'
-              className='h-9 px-4'
-            >
-              {redeeming && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-              {t('Redeem')}
-            </Button>
-          </div>
-          {topupLink && (
-            <p className='text-muted-foreground text-xs'>
-              {t('Need a redemption code?')}{' '}
-              <a
-                href={topupLink}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='inline-flex items-center gap-1 underline-offset-4 hover:underline'
-              >
-                {t('Get one here')}
-                <ExternalLink className='h-3 w-3' />
-              </a>
-            </p>
-          )}
-        </div>
-      ) : (
-        <Alert className='border-t'>
-          <AlertDescription>
-            {t(
-              'Redemption codes are disabled until the administrator confirms compliance terms.'
-            )}
-          </AlertDescription>
-        </Alert>
-      )}
     </TitledCard>
   )
 }
