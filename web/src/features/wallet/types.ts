@@ -45,6 +45,13 @@ export type CreemPaymentResponse = ApiResponse<{ checkout_url: string }>
 export type WaffoPaymentResponse = ApiResponse<
   { payment_url?: string } | string
 >
+export interface XunhuPayCheckout {
+  url?: string
+  url_qrcode?: string
+}
+
+export type XunhuPayPaymentResponse = ApiResponse<XunhuPayCheckout>
+
 export type WaffoPancakePaymentResponse = ApiResponse<
   | {
       checkout_url?: string
@@ -148,6 +155,8 @@ export interface TopupInfo {
   waffo_min_topup?: number
   /** Whether Waffo Pancake topup is enabled */
   enable_waffo_pancake_topup?: boolean
+  /** Whether XunhuPay (虎皮椒) WeChat or Alipay top-up is enabled */
+  enable_xunhupay_topup?: boolean
   /** Minimum topup amount for Waffo Pancake */
   waffo_pancake_min_topup?: number
   /** Whether redemption code usage is enabled */

@@ -36,6 +36,8 @@ export const PAYMENT_TYPES = {
   CREEM: 'creem',
   WAFFO: 'waffo',
   WAFFO_PANCAKE: 'waffo_pancake',
+  XUNHU_WECHAT: 'xunhupay_wxpay',
+  XUNHU_ALIPAY: 'xunhupay_alipay',
 } as const
 
 /**

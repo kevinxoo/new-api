@@ -7400,6 +7400,27 @@
     "Zhipu": "Zhipu",
     "Zhipu GLM": "Zhipu GLM",
     "Zhipu V4": "Zhipu V4",
-    "Zoom": "Zoom"
+    "Zoom": "Zoom",
+    "After payment, the browser returns to <server address>/wallet.": "После оплаты браузер возвращается на <адрес сервера>/wallet.",
+    "Alipay AppID": "AppID Alipay",
+    "Alipay AppSecret": "AppSecret Alipay",
+    "Configuration for XunhuPay wallet top-ups": "Настройка пополнения через XunhuPay",
+    "Failed to start XunhuPay payment": "Не удалось начать оплату XunhuPay",
+    "Notify URL": "URL уведомления",
+    "Payment gateway response could not be verified": "Не удалось проверить ответ платежного шлюза",
+    "Return URL": "URL возврата",
+    "Scan to pay": "Сканируйте для оплаты",
+    "Server address is not configured": "Адрес сервера не настроен",
+    "The QR code expires in 5 minutes. Your balance updates after the payment is confirmed.": "QR-код действует 5 минут. Баланс обновится после подтверждения оплаты.",
+    "Use the full payment URL ending in /payment/do.html. Leave blank to use https://api.xunhupay.com/payment/do.html. Do not append submit.php.": "Укажите полный URL оплаты, заканчивающийся на /payment/do.html. Пустое значение использует https://api.xunhupay.com/payment/do.html. Не добавляйте submit.php.",
+    "WeChat AppID": "AppID WeChat",
+    "WeChat AppSecret": "AppSecret WeChat",
+    "WeChat and Alipay are separate XunhuPay apps. Enter the AppID and AppSecret for each channel you want to offer.": "WeChat и Alipay — отдельные приложения XunhuPay. Укажите AppID и AppSecret для каждого канала, который нужно показать.",
+    "XunhuPay": "XunhuPay (虎皮椒)",
+    "XunhuPay gateway URL": "URL шлюза XunhuPay",
+    "XunhuPay gateway URL must end with /payment/do.html and must not use submit.php.": "URL шлюза XunhuPay должен заканчиваться на /payment/do.html и не должен использовать submit.php.",
+    "XunhuPay notify URL is too long": "URL уведомления XunhuPay слишком длинный",
+    "XunhuPay payment method is not enabled": "Этот способ оплаты XunhuPay не включен",
+    "XunhuPay posts payment results to <callback address>/api/user/xunhupay/notify. The callback address is the Epay callback address when set, otherwise the server address.": "XunhuPay отправляет результат на <адрес callback>/api/user/xunhupay/notify. Если задан callback Epay, используется он, иначе адрес сервера."
   }
 }

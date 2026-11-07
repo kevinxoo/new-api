@@ -108,3 +108,14 @@ func isEpayWebhookConfigured() bool {
 func isEpayWebhookEnabled() bool {
 	return isEpayTopUpEnabled()
 }
+
+func isXunhuPayTopUpEnabled() bool {
+	if !isPaymentComplianceConfirmed() {
+		return false
+	}
+	return len(xunhuPayReadyChannels()) > 0
+}
+
+func isXunhuPayWebhookEnabled() bool {
+	return isXunhuPayTopUpEnabled()
+}

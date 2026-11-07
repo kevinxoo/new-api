@@ -75,6 +75,27 @@ func GetTopUpInfo(c *gin.Context) {
 		}
 	}
 
+	if isXunhuPayTopUpEnabled() {
+		xunhuMethods := []map[string]string{}
+		if _, ok := xunhuPayChannelByMethod(model.PaymentMethodXunhuPayWechat); ok {
+			xunhuMethods = append(xunhuMethods, map[string]string{
+				"name":      "WeChat Pay",
+				"type":      model.PaymentMethodXunhuPayWechat,
+				"color":     "#07C160",
+				"min_topup": strconv.Itoa(operation_setting.MinTopUp),
+			})
+		}
+		if _, ok := xunhuPayChannelByMethod(model.PaymentMethodXunhuPayAlipay); ok {
+			xunhuMethods = append(xunhuMethods, map[string]string{
+				"name":      "Alipay",
+				"type":      model.PaymentMethodXunhuPayAlipay,
+				"color":     "#1677FF",
+				"min_topup": strconv.Itoa(operation_setting.MinTopUp),
+			})
+		}
+		payMethods = append(payMethods, xunhuMethods...)
+	}
+
 	// 如果启用了 Waffo 支付，添加到支付方法列表
 	enableWaffo := isWaffoTopUpEnabled()
 	if enableWaffo {
@@ -103,6 +124,7 @@ func GetTopUpInfo(c *gin.Context) {
 		"enable_creem_topup":               isCreemTopUpEnabled(),
 		"enable_waffo_topup":               enableWaffo,
 		"enable_waffo_pancake_topup":       enableWaffoPancake,
+		"enable_xunhupay_topup":            isXunhuPayTopUpEnabled(),
 		"enable_redemption":                complianceConfirmed,
 		"payment_compliance_confirmed":     complianceConfirmed,
 		"payment_compliance_terms_version": operation_setting.CurrentComplianceTermsVersion,

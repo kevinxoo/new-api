@@ -111,10 +111,78 @@ export function isWaffoPancakePayment(paymentType: string): boolean {
   return paymentType === PAYMENT_TYPES.WAFFO_PANCAKE
 }
 
+export function isXunhuPayPayment(paymentType: string): boolean {
+  return (
+    paymentType === PAYMENT_TYPES.XUNHU_WECHAT ||
+    paymentType === PAYMENT_TYPES.XUNHU_ALIPAY
+  )
+}
+
+function httpsPaymentURL(value: unknown): string {
+  if (typeof value !== 'string' || !value.trim()) return ''
+  try {
+    const parsed = new URL(value.trim())
+    if (parsed.protocol !== 'https:' || parsed.username || parsed.password) {
+      return ''
+    }
+    return parsed.toString()
+  } catch {
+    return ''
+  }
+}
+
+export interface XunhuPayPresentation {
+  action: 'redirect' | 'qr' | 'none'
+  url: string
+  qrURL: string
+}
+
+/**
+ * 虎皮椒 PC checkout is the QR image. Mobile checkout is the https cashier URL.
+ * The two are not shown together, because the gateway rejects that sequence.
+ */
+export function resolveXunhuPayCheckout(
+  checkout: { url?: string; url_qrcode?: string } | null | undefined,
+  isMobile: boolean
+): XunhuPayPresentation {
+  const url = httpsPaymentURL(checkout?.url)
+  const qrURL = httpsPaymentURL(checkout?.url_qrcode)
+  if (isMobile && url) {
+    return { action: 'redirect', url, qrURL: '' }
+  }
+  if (qrURL) {
+    return { action: 'qr', url: '', qrURL }
+  }
+  if (url) {
+    return { action: 'redirect', url, qrURL: '' }
+  }
+  return { action: 'none', url: '', qrURL: '' }
+}
+
+export function visiblePayMethods(topupInfo: TopupInfo | null): PaymentMethod[] {
+  if (!topupInfo?.pay_methods) return []
+  return topupInfo.pay_methods.filter((method) => {
+    if (method.type === PAYMENT_TYPES.STRIPE) {
+      return !!topupInfo.enable_stripe_topup
+    }
+    if (method.type === PAYMENT_TYPES.WAFFO) {
+      return !!topupInfo.enable_waffo_topup
+    }
+    if (method.type === PAYMENT_TYPES.WAFFO_PANCAKE) {
+      return !!topupInfo.enable_waffo_pancake_topup
+    }
+    if (isXunhuPayPayment(method.type)) {
+      return !!topupInfo.enable_xunhupay_topup
+    }
+    return !!topupInfo.enable_online_topup
+  })
+}
+
 export interface PaymentProcessors {
   regular: (topupAmount: number, paymentType: string) => Promise<boolean>
   waffo: (topupAmount: number, payMethodIndex: number) => Promise<boolean>
   waffoPancake: (topupAmount: number) => Promise<boolean>
+  xunhupay: (topupAmount: number, paymentType: string) => Promise<boolean>
 }
 
 export async function dispatchSelectedPayment(
@@ -132,6 +200,10 @@ export async function dispatchSelectedPayment(
 
   if (isWaffoPancakePayment(paymentMethod.type)) {
     return processors.waffoPancake(topupAmount)
+  }
+
+  if (isXunhuPayPayment(paymentMethod.type)) {
+    return processors.xunhupay(topupAmount, paymentMethod.type)
   }
 
   return processors.regular(topupAmount, paymentMethod.type)
@@ -173,7 +245,7 @@ export function getMinTopupAmount(topupInfo: TopupInfo | null): number {
     return DEFAULT_MIN_TOPUP
   }
 
-  if (topupInfo.enable_online_topup) {
+  if (topupInfo.enable_online_topup || topupInfo.enable_xunhupay_topup) {
     return topupInfo.min_topup
   }
 

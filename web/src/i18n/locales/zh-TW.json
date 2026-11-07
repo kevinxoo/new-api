@@ -7400,6 +7400,27 @@
     "Zhipu": "智譜",
     "Zhipu GLM": "智譜GLM",
     "Zhipu V4": "智譜 V4",
-    "Zoom": "縮放"
+    "Zoom": "縮放",
+    "After payment, the browser returns to <server address>/wallet.": "付款完成後，瀏覽器返回 <伺服器網址>/wallet。",
+    "Alipay AppID": "支付寶 AppID",
+    "Alipay AppSecret": "支付寶 AppSecret",
+    "Configuration for XunhuPay wallet top-ups": "設定虎皮椒錢包儲值",
+    "Failed to start XunhuPay payment": "無法發起虎皮椒付款",
+    "Notify URL": "通知網址",
+    "Payment gateway response could not be verified": "無法驗證付款閘道回應",
+    "Return URL": "返回網址",
+    "Scan to pay": "掃碼付款",
+    "Server address is not configured": "未設定伺服器網址",
+    "The QR code expires in 5 minutes. Your balance updates after the payment is confirmed.": "二維碼 5 分鐘內有效。付款確認後餘額會更新。",
+    "Use the full payment URL ending in /payment/do.html. Leave blank to use https://api.xunhupay.com/payment/do.html. Do not append submit.php.": "填寫以 /payment/do.html 結尾的完整付款網址。留空則使用 https://api.xunhupay.com/payment/do.html。不要附加 submit.php。",
+    "WeChat AppID": "微信 AppID",
+    "WeChat AppSecret": "微信 AppSecret",
+    "WeChat and Alipay are separate XunhuPay apps. Enter the AppID and AppSecret for each channel you want to offer.": "微信和支付寶在虎皮椒中是兩個獨立應用。請為要開放的通道分別填寫 AppID 和 AppSecret。",
+    "XunhuPay": "虎皮椒",
+    "XunhuPay gateway URL": "虎皮椒閘道網址",
+    "XunhuPay gateway URL must end with /payment/do.html and must not use submit.php.": "虎皮椒閘道網址必須以 /payment/do.html 結尾，且不能使用 submit.php。",
+    "XunhuPay notify URL is too long": "虎皮椒通知網址過長",
+    "XunhuPay payment method is not enabled": "未啟用此虎皮椒付款方式",
+    "XunhuPay posts payment results to <callback address>/api/user/xunhupay/notify. The callback address is the Epay callback address when set, otherwise the server address.": "虎皮椒會把付款結果 POST 到 <回呼網址>/api/user/xunhupay/notify。若已填寫易支付回呼網址則使用該網址，否則使用伺服器網址。"
   }
 }

@@ -902,6 +902,13 @@ export const STATIC_I18N_KEYS = [
   'Verification method',
   'Admin permissions updated',
   'Provider ID',
+  // XunhuPay payment API errors. The form and the server share the gateway message.
+  'XunhuPay gateway URL must end with /payment/do.html and must not use submit.php.',
+  'Server address is not configured',
+  'XunhuPay payment method is not enabled',
+  'Payment gateway response could not be verified',
+  'Failed to start XunhuPay payment',
+  'XunhuPay notify URL is too long',
   // Channel priority ordering API errors.
   'Channel priorities changed. Refresh and try again.',
   'Invalid channel priority move',

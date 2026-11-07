@@ -309,6 +309,11 @@ export type BillingSettings = {
   PayAddress: string
   EpayId: string
   EpayKey: string
+  XunhuPayGateway: string
+  XunhuPayWechatAppId: string
+  XunhuPayWechatAppSecret: string
+  XunhuPayAlipayAppId: string
+  XunhuPayAlipayAppSecret: string
   Price: number
   MinTopUp: number
   CustomCallbackAddress: string
