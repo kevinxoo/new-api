@@ -7400,6 +7400,27 @@
     "Zhipu": "Zhipu",
     "Zhipu GLM": "Zhipu GLM",
     "Zhipu V4": "Zhipu V4",
-    "Zoom": "Zoom"
+    "Zoom": "Zoom",
+    "After payment, the browser returns to <server address>/wallet.": "Après le paiement, le navigateur revient sur <adresse du serveur>/wallet.",
+    "Alipay AppID": "AppID Alipay",
+    "Alipay AppSecret": "AppSecret Alipay",
+    "Configuration for XunhuPay wallet top-ups": "Configuration des recharges XunhuPay",
+    "Failed to start XunhuPay payment": "Impossible de démarrer le paiement XunhuPay",
+    "Notify URL": "URL de notification",
+    "Payment gateway response could not be verified": "La réponse de la passerelle de paiement n'a pas pu être vérifiée",
+    "Return URL": "URL de retour",
+    "Scan to pay": "Scanner pour payer",
+    "Server address is not configured": "L'adresse du serveur n'est pas configurée",
+    "The QR code expires in 5 minutes. Your balance updates after the payment is confirmed.": "Le QR code expire au bout de 5 minutes. Le solde est mis à jour après confirmation du paiement.",
+    "Use the full payment URL ending in /payment/do.html. Leave blank to use https://api.xunhupay.com/payment/do.html. Do not append submit.php.": "Utilisez l'URL de paiement complète se terminant par /payment/do.html. Laissez vide pour utiliser https://api.xunhupay.com/payment/do.html. N'ajoutez pas submit.php.",
+    "WeChat AppID": "AppID WeChat",
+    "WeChat AppSecret": "AppSecret WeChat",
+    "WeChat and Alipay are separate XunhuPay apps. Enter the AppID and AppSecret for each channel you want to offer.": "WeChat et Alipay sont des applications XunhuPay distinctes. Saisissez l'AppID et l'AppSecret de chaque canal à proposer.",
+    "XunhuPay": "XunhuPay",
+    "XunhuPay gateway URL": "URL de la passerelle XunhuPay",
+    "XunhuPay gateway URL must end with /payment/do.html and must not use submit.php.": "L'URL de la passerelle XunhuPay doit se terminer par /payment/do.html et ne doit pas utiliser submit.php.",
+    "XunhuPay notify URL is too long": "L'URL de notification XunhuPay est trop longue",
+    "XunhuPay payment method is not enabled": "Ce moyen de paiement XunhuPay n'est pas activé",
+    "XunhuPay posts payment results to <callback address>/api/user/xunhupay/notify. The callback address is the Epay callback address when set, otherwise the server address.": "XunhuPay envoie le résultat du paiement à <adresse de rappel>/api/user/xunhupay/notify. L'adresse de rappel Epay est utilisée lorsqu'elle est renseignée, sinon l'adresse du serveur."
   }
 }

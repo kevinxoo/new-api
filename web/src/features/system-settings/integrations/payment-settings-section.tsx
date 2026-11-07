@@ -81,6 +81,7 @@ import {
   WaffoSettingsSection,
   type WaffoSettingsValues,
 } from './waffo-settings-section'
+import { XunhuPaySettingsSection } from './xunhupay-settings-section'
 
 function isHttpOriginUrl(value: string) {
   const trimmed = value.trim()
@@ -178,6 +179,27 @@ const paymentSchema = z.object({
   WaffoPancakeMerchantID: z.string(),
   WaffoPancakePrivateKey: z.string(),
   WaffoPancakeReturnURL: z.string(),
+  XunhuPayGateway: z.string().refine((value) => {
+    const trimmed = value.trim().replace(/\/+$/, '')
+    if (!trimmed) return true
+    if (trimmed.toLowerCase().includes('submit.php')) return false
+    try {
+      const url = new URL(trimmed)
+      return (
+        (url.protocol === 'http:' || url.protocol === 'https:') &&
+        !url.username &&
+        !url.search &&
+        !url.hash &&
+        url.pathname.toLowerCase().endsWith('/payment/do.html')
+      )
+    } catch {
+      return false
+    }
+  }, 'XunhuPay gateway URL must end with /payment/do.html and must not use submit.php.'),
+  XunhuPayWechatAppId: z.string(),
+  XunhuPayWechatAppSecret: z.string(),
+  XunhuPayAlipayAppId: z.string(),
+  XunhuPayAlipayAppSecret: z.string(),
 })
 
 type PaymentFormValues = z.infer<typeof paymentSchema>
@@ -459,6 +481,11 @@ export function PaymentSettingsSection({
       WaffoPancakeReturnURL: removeTrailingSlash(
         values.WaffoPancakeReturnURL.trim()
       ),
+      XunhuPayGateway: values.XunhuPayGateway.trim().replace(/\/+$/, ''),
+      XunhuPayWechatAppId: values.XunhuPayWechatAppId.trim(),
+      XunhuPayWechatAppSecret: values.XunhuPayWechatAppSecret.trim(),
+      XunhuPayAlipayAppId: values.XunhuPayAlipayAppId.trim(),
+      XunhuPayAlipayAppSecret: values.XunhuPayAlipayAppSecret.trim(),
     }
 
     const initial = {
@@ -506,6 +533,16 @@ export function PaymentSettingsSection({
       WaffoPancakeReturnURL: removeTrailingSlash(
         initialRef.current.WaffoPancakeReturnURL.trim()
       ),
+      XunhuPayGateway: initialRef.current.XunhuPayGateway.trim().replace(
+        /\/+$/,
+        ''
+      ),
+      XunhuPayWechatAppId: initialRef.current.XunhuPayWechatAppId.trim(),
+      XunhuPayWechatAppSecret:
+        initialRef.current.XunhuPayWechatAppSecret.trim(),
+      XunhuPayAlipayAppId: initialRef.current.XunhuPayAlipayAppId.trim(),
+      XunhuPayAlipayAppSecret:
+        initialRef.current.XunhuPayAlipayAppSecret.trim(),
     }
 
     const updates: Array<{ key: string; value: string | number | boolean }> = []
@@ -703,6 +740,40 @@ export function PaymentSettingsSection({
       updates.push({ key: 'WaffoPayMethods', value: sanitized.WaffoPayMethods })
     }
 
+    if (sanitized.XunhuPayGateway !== initial.XunhuPayGateway) {
+      updates.push({ key: 'XunhuPayGateway', value: sanitized.XunhuPayGateway })
+    }
+    if (sanitized.XunhuPayWechatAppId !== initial.XunhuPayWechatAppId) {
+      updates.push({
+        key: 'XunhuPayWechatAppId',
+        value: sanitized.XunhuPayWechatAppId,
+      })
+    }
+    if (
+      sanitized.XunhuPayWechatAppSecret &&
+      sanitized.XunhuPayWechatAppSecret !== initial.XunhuPayWechatAppSecret
+    ) {
+      updates.push({
+        key: 'XunhuPayWechatAppSecret',
+        value: sanitized.XunhuPayWechatAppSecret,
+      })
+    }
+    if (sanitized.XunhuPayAlipayAppId !== initial.XunhuPayAlipayAppId) {
+      updates.push({
+        key: 'XunhuPayAlipayAppId',
+        value: sanitized.XunhuPayAlipayAppId,
+      })
+    }
+    if (
+      sanitized.XunhuPayAlipayAppSecret &&
+      sanitized.XunhuPayAlipayAppSecret !== initial.XunhuPayAlipayAppSecret
+    ) {
+      updates.push({
+        key: 'XunhuPayAlipayAppSecret',
+        value: sanitized.XunhuPayAlipayAppSecret,
+      })
+    }
+
     const hasWaffoPancakeChanges =
       sanitized.WaffoPancakeMerchantID !== initial.WaffoPancakeMerchantID ||
       sanitized.WaffoPancakePrivateKey.length > 0 ||
@@ -882,9 +953,10 @@ export function PaymentSettingsSection({
           />
           <Tabs defaultValue='general' className='min-w-0'>
             <div className='overflow-x-auto pb-1'>
-              <TabsList className='grid min-w-[44rem] grid-cols-6'>
+              <TabsList className='grid min-w-[52rem] grid-cols-7'>
                 <TabsTrigger value='general'>{t('General')}</TabsTrigger>
                 <TabsTrigger value='epay'>Epay</TabsTrigger>
+                <TabsTrigger value='xunhupay'>{t('XunhuPay')}</TabsTrigger>
                 <TabsTrigger value='stripe'>{t('Stripe')}</TabsTrigger>
                 <TabsTrigger value='creem'>Creem</TabsTrigger>
                 <TabsTrigger value='waffo-pancake'>Waffo Pancake</TabsTrigger>
@@ -1256,6 +1328,13 @@ export function PaymentSettingsSection({
                   />
                 </div>
               </div>
+            </TabsContent>
+
+            <TabsContent
+              value='xunhupay'
+              className={paymentTabContentClassName}
+            >
+              <XunhuPaySettingsSection />
             </TabsContent>
 
             <TabsContent value='stripe' className={paymentTabContentClassName}>

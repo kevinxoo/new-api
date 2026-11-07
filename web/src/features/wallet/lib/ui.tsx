@@ -97,7 +97,14 @@ export function getPaymentIcon(
     return <CreditCard className={className} />
   }
 
-  switch (paymentType) {
+  let resolvedType = paymentType
+  if (paymentType === PAYMENT_TYPES.XUNHU_WECHAT) {
+    resolvedType = PAYMENT_TYPES.WECHAT
+  } else if (paymentType === PAYMENT_TYPES.XUNHU_ALIPAY) {
+    resolvedType = PAYMENT_TYPES.ALIPAY
+  }
+
+  switch (resolvedType) {
     case PAYMENT_TYPES.ALIPAY:
       return (
         <IconAlipay

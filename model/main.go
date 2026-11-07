@@ -40,6 +40,12 @@ func jsonScanBytes(value any) []byte {
 	}
 }
 
+// InitColumnNames sets the dialect-specific quoted column names used by queries.
+// Startup calls it from InitDB. Tests that open a database directly call it too.
+func InitColumnNames() {
+	initCol()
+}
+
 func initCol() {
 	// init common column names
 	if common.UsingMainDatabase(common.DatabaseTypePostgreSQL) {

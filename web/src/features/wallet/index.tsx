@@ -28,6 +28,7 @@ import { AffiliateRewardsCard } from './components/affiliate-rewards-card'
 import { BillingHistoryDialog } from './components/dialogs/billing-history-dialog'
 import { CreemConfirmDialog } from './components/dialogs/creem-confirm-dialog'
 import { PaymentConfirmDialog } from './components/dialogs/payment-confirm-dialog'
+import { XunhuPayCheckoutDialog } from './components/dialogs/xunhupay-checkout-dialog'
 import { TransferDialog } from './components/dialogs/transfer-dialog'
 import { RechargeFormCard } from './components/recharge-form-card'
 import { SubscriptionPlansCard } from './components/subscription-plans-card'
@@ -41,6 +42,7 @@ import {
   useCreemPayment,
   useWaffoPayment,
   useWaffoPancakePayment,
+  useXunhuPayPayment,
 } from './hooks'
 import {
   getDefaultPaymentType,
@@ -108,6 +110,12 @@ export function Wallet(props: WalletProps) {
   const { processing: waffoProcessing, processWaffoPayment } = useWaffoPayment()
   const { processing: pancakeProcessing, processWaffoPancakePayment } =
     useWaffoPancakePayment()
+  const {
+    processing: xunhuProcessing,
+    processXunhuPayPayment,
+    checkout: xunhuCheckout,
+    closeCheckout: closeXunhuCheckout,
+  } = useXunhuPayPayment()
 
   // Fetch and refresh user data
   const fetchUser = useCallback(async () => {
@@ -202,6 +210,7 @@ export function Wallet(props: WalletProps) {
         regular: processPayment,
         waffo: processWaffoPayment,
         waffoPancake: processWaffoPancakePayment,
+        xunhupay: processXunhuPayPayment,
       }
     )
 
@@ -360,9 +369,19 @@ export function Wallet(props: WalletProps) {
         paymentAmount={paymentAmount}
         paymentMethod={selectedPaymentMethod}
         calculating={calculating}
-        processing={processing || waffoProcessing || pancakeProcessing}
+        processing={
+          processing || waffoProcessing || pancakeProcessing || xunhuProcessing
+        }
         discountRate={getDiscountRate()}
         usdExchangeRate={effectiveUsdExchangeRate}
+      />
+
+      <XunhuPayCheckoutDialog
+        open={xunhuCheckout?.action === 'qr'}
+        qrURL={xunhuCheckout?.qrURL ?? ''}
+        onOpenChange={(open) => {
+          if (!open) closeXunhuCheckout()
+        }}
       />
 
       <TransferDialog

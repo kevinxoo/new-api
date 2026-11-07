@@ -7400,6 +7400,27 @@
     "Zhipu": "Zhipu",
     "Zhipu GLM": "Zhipu GLM",
     "Zhipu V4": "Zhipu V4",
-    "Zoom": "Zoom"
+    "Zoom": "Zoom",
+    "After payment, the browser returns to <server address>/wallet.": "Sau khi thanh toán, trình duyệt quay về <địa chỉ máy chủ>/wallet.",
+    "Alipay AppID": "AppID Alipay",
+    "Alipay AppSecret": "AppSecret Alipay",
+    "Configuration for XunhuPay wallet top-ups": "Cấu hình nạp ví XunhuPay",
+    "Failed to start XunhuPay payment": "Không thể bắt đầu thanh toán XunhuPay",
+    "Notify URL": "URL thông báo",
+    "Payment gateway response could not be verified": "Không thể xác minh phản hồi của cổng thanh toán",
+    "Return URL": "URL quay lại",
+    "Scan to pay": "Quét để thanh toán",
+    "Server address is not configured": "Chưa cấu hình địa chỉ máy chủ",
+    "The QR code expires in 5 minutes. Your balance updates after the payment is confirmed.": "Mã QR hết hạn sau 5 phút. Số dư cập nhật sau khi thanh toán được xác nhận.",
+    "Use the full payment URL ending in /payment/do.html. Leave blank to use https://api.xunhupay.com/payment/do.html. Do not append submit.php.": "Dùng URL thanh toán đầy đủ kết thúc bằng /payment/do.html. Để trống để dùng https://api.xunhupay.com/payment/do.html. Không thêm submit.php.",
+    "WeChat AppID": "AppID WeChat",
+    "WeChat AppSecret": "AppSecret WeChat",
+    "WeChat and Alipay are separate XunhuPay apps. Enter the AppID and AppSecret for each channel you want to offer.": "WeChat và Alipay là hai ứng dụng XunhuPay riêng. Nhập AppID và AppSecret cho từng kênh muốn mở.",
+    "XunhuPay": "XunhuPay",
+    "XunhuPay gateway URL": "URL cổng XunhuPay",
+    "XunhuPay gateway URL must end with /payment/do.html and must not use submit.php.": "URL cổng XunhuPay phải kết thúc bằng /payment/do.html và không được dùng submit.php.",
+    "XunhuPay notify URL is too long": "URL thông báo XunhuPay quá dài",
+    "XunhuPay payment method is not enabled": "Phương thức thanh toán XunhuPay này chưa được bật",
+    "XunhuPay posts payment results to <callback address>/api/user/xunhupay/notify. The callback address is the Epay callback address when set, otherwise the server address.": "XunhuPay gửi kết quả tới <địa chỉ callback>/api/user/xunhupay/notify. Nếu đã đặt địa chỉ callback Epay thì dùng địa chỉ đó, nếu không thì dùng địa chỉ máy chủ."
   }
 }

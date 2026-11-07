@@ -7400,6 +7400,27 @@
     "Zhipu": "Zhipu",
     "Zhipu GLM": "Zhipu GLM",
     "Zhipu V4": "Zhipu V 4",
-    "Zoom": "ズーム"
+    "Zoom": "ズーム",
+    "After payment, the browser returns to <server address>/wallet.": "支払い後、ブラウザは <サーバーアドレス>/wallet に戻ります。",
+    "Alipay AppID": "AlipayのAppID",
+    "Alipay AppSecret": "AlipayのAppSecret",
+    "Configuration for XunhuPay wallet top-ups": "虎皮椒のウォレットチャージ設定",
+    "Failed to start XunhuPay payment": "虎皮椒の支払いを開始できませんでした",
+    "Notify URL": "通知 URL",
+    "Payment gateway response could not be verified": "決済ゲートウェイの応答を検証できませんでした",
+    "Return URL": "戻り URL",
+    "Scan to pay": "スキャンして支払う",
+    "Server address is not configured": "サーバーアドレスが設定されていません",
+    "The QR code expires in 5 minutes. Your balance updates after the payment is confirmed.": "QR コードの有効期限は 5 分です。支払い確認後に残高が更新されます。",
+    "Use the full payment URL ending in /payment/do.html. Leave blank to use https://api.xunhupay.com/payment/do.html. Do not append submit.php.": "/payment/do.html で終わる完全な支払い URL を入力します。空欄の場合は https://api.xunhupay.com/payment/do.html を使います。submit.php は付けないでください。",
+    "WeChat AppID": "WeChatのAppID",
+    "WeChat AppSecret": "WeChatのAppSecret",
+    "WeChat and Alipay are separate XunhuPay apps. Enter the AppID and AppSecret for each channel you want to offer.": "WeChat と Alipay は別々の虎皮椒アプリです。提供するチャネルごとに AppID と AppSecret を入力してください。",
+    "XunhuPay": "虎皮椒",
+    "XunhuPay gateway URL": "虎皮椒ゲートウェイ URL",
+    "XunhuPay gateway URL must end with /payment/do.html and must not use submit.php.": "虎皮椒ゲートウェイ URL は /payment/do.html で終わる必要があり、submit.php は使えません。",
+    "XunhuPay notify URL is too long": "虎皮椒の通知 URL が長すぎます",
+    "XunhuPay payment method is not enabled": "この虎皮椒の支払い方法は有効になっていません",
+    "XunhuPay posts payment results to <callback address>/api/user/xunhupay/notify. The callback address is the Epay callback address when set, otherwise the server address.": "虎皮椒は支払い結果を <コールバックアドレス>/api/user/xunhupay/notify に送信します。Epay のコールバックアドレスがあればそれを使い、なければサーバーアドレスを使います。"
   }
 }

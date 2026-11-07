@@ -137,6 +137,13 @@ const BILLING_SECTIONS = [
           PayAddress: settings.PayAddress,
           EpayId: settings.EpayId,
           EpayKey: settings.EpayKey,
+          XunhuPayGateway:
+            settings.XunhuPayGateway ||
+            'https://api.xunhupay.com/payment/do.html',
+          XunhuPayWechatAppId: settings.XunhuPayWechatAppId ?? '',
+          XunhuPayWechatAppSecret: settings.XunhuPayWechatAppSecret ?? '',
+          XunhuPayAlipayAppId: settings.XunhuPayAlipayAppId ?? '',
+          XunhuPayAlipayAppSecret: settings.XunhuPayAlipayAppSecret ?? '',
           Price: settings.Price,
           MinTopUp: settings.MinTopUp,
           CustomCallbackAddress: settings.CustomCallbackAddress,
