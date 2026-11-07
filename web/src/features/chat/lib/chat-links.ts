@@ -74,6 +74,27 @@ function toBase64(value: string) {
   return ''
 }
 
+export function isHiddenOneClickPreset(
+  preset: Pick<ChatPreset, 'name' | 'url'>
+): boolean {
+  const name = preset.name.trim().toLowerCase().replaceAll(/\s+/g, ' ')
+  if (
+    name === 'ccs' ||
+    name.includes('cc switch') ||
+    name.includes('cherry studio')
+  ) {
+    return true
+  }
+
+  const url = preset.url.trim().toLowerCase()
+  return (
+    url === 'ccswitch' ||
+    url.startsWith('ccswitch:') ||
+    url.startsWith('cherrystudio:') ||
+    url.includes('{cherryconfig}')
+  )
+}
+
 export function detectChatLinkType(url: string): ChatLinkType {
   if (HTTP_REGEX.test(url)) {
     return 'web'

@@ -33,8 +33,6 @@ type ApiKeysContextType = {
   setCurrentRow: React.Dispatch<React.SetStateAction<ApiKey | null>>
   refreshTrigger: number
   triggerRefresh: () => void
-  resolvedKey: string
-  setResolvedKey: React.Dispatch<React.SetStateAction<string>>
   resolveRealKey: (id: number) => Promise<string | null>
   resolveRealKeysBatch: (ids: number[]) => Promise<Record<number, string>>
   resolvedKeys: Record<number, string>
@@ -50,8 +48,6 @@ export function ApiKeysProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<ApiKeysDialogType>(null)
   const [currentRow, setCurrentRow] = useState<ApiKey | null>(null)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
-  const [resolvedKey, setResolvedKey] = useState('')
-
   const [resolvedKeys, setResolvedKeys] = useState<Record<number, string>>({})
   const [loadingKeys, setLoadingKeys] = useState<Record<number, boolean>>({})
   const pendingRequests = useRef<Record<number, Promise<string | null>>>({})
@@ -163,8 +159,6 @@ export function ApiKeysProvider({ children }: { children: React.ReactNode }) {
         setCurrentRow,
         refreshTrigger,
         triggerRefresh,
-        resolvedKey,
-        setResolvedKey,
         resolveRealKey,
         resolveRealKeysBatch,
         resolvedKeys,
