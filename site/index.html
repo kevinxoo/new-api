@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>灵域AI · 写一句话，出一段片 · Muse 视频 ¥0.05/秒</title>
+    <meta
+      name="description"
+      content="灵域AI 用 Muse 生成视频。一句话、一张参考图，或多至十张图，5–10 秒成片。真实拍摄质感，按秒 ¥0.05，支持在线画布与 OpenAI 兼容 API。"
+    />
+    <meta name="theme-color" content="#0b0c0e" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="灵域AI" />
+    <meta property="og:title" content="灵域AI · 写一句话，出一段片" />
+    <meta property="og:description" content="真实拍摄感的文生视频。5–10 秒成片，按秒 ¥0.05，在线画布直接出片。" />
+    <meta property="og:image" content="https://lingyuai.shop/media/works/work-01.webp" />
+    <meta property="og:url" content="https://lingyuai.shop/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/css/site.css?v=6" />
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到正文</a>
+
+    <header class="nav wrap">
+      <a class="brand" href="/" aria-label="灵域AI 首页">
+        <img class="brand-mark" src="/logo.png" width="32" height="32" alt="" />
+        <span class="word">灵域AI</span>
+      </a>
+      <nav class="nav-links nav-anchor" aria-label="页面分区">
+        <a class="text" href="#works">作品</a>
+        <a class="text" href="#canvas">画布</a>
+        <a class="text" href="#ability">能力</a>
+        <a class="text" href="#pricing">定价</a>
+      </nav>
+      <nav class="nav-links" aria-label="账户">
+        <a class="text" href="/sign-in">登录</a>
+        <a class="button" href="/sign-up">免费注册</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <!-- ── 首屏 ───────────────────────────────────────── -->
+      <section class="hero wrap" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">MUSE 视频 · 文生视频</p>
+          <h1 id="hero-title">写一句话，<br />出一段片。</h1>
+          <p class="lede">
+            真实拍摄质感的文生视频。一句话、一张参考图，或多至十张图，<br class="wide" />5 到 10 秒成片，按秒计费。
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="/sign-up">免费注册领 Key</a>
+            <a class="ghost" href="#works">看作品 <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+
+        <aside class="spec-card">
+          <dl>
+            <div>
+              <dt>时长</dt>
+              <dd>5 / 10 秒</dd>
+            </div>
+            <div>
+              <dt>画幅</dt>
+              <dd>16:9 · 9:16 · 1:1</dd>
+            </div>
+            <div>
+              <dt>参考</dt>
+              <dd>纯文字 · 单图 · 最多 10 图</dd>
+            </div>
+            <div>
+              <dt>价格</dt>
+              <dd class="spec-price">¥0.05 <span>/ 秒</span></dd>
+            </div>
+          </dl>
+          <p class="spec-note">真实拍摄质感 · 非 CGI · 无水印</p>
+        </aside>
+      </section>
+
+      <!-- ── 作品 ───────────────────────────────────────── -->
+      <section id="works" class="block" aria-labelledby="works-title">
+        <div class="wrap">
+          <div class="section-head">
+            <h2 id="works-title">作品</h2>
+            <p class="section-sub">全部由一段文字生成。提示词可以展开查看，也能直接复制去试。</p>
+          </div>
+          <div id="workGrid" class="works-grid"></div>
+          <noscript>
+            <p class="works-note">作品墙需要开启 JavaScript 才能显示。</p>
+          </noscript>
+          <p class="works-note">新作品持续加入</p>
+        </div>
+      </section>
+
+      <!-- ── 画布 ───────────────────────────────────────── -->
+      <section id="canvas" class="block" aria-labelledby="canvas-title">
+        <div class="wrap">
+          <div class="section-head">
+            <h2 id="canvas-title">在线画布</h2>
+            <p class="section-sub">不用写代码，也不用装东西。拖出一个节点、填上提示词，就能出图出片。</p>
+          </div>
+
+          <div class="canvas-grid reveal">
+            <article class="canvas-card">
+              <span class="idx">01</span>
+              <h3>生图节点</h3>
+              <p>写提示词，最多挂 10 张参考图，选好比例直接出图。出好的图还能接着当下一张的参考。</p>
+            </article>
+            <article class="canvas-card">
+              <span class="idx">02</span>
+              <h3>生视频节点</h3>
+              <p>提示词描述画面，可选一张首帧定住开头。5 秒或 10 秒，横屏、竖屏、方屏都能选。</p>
+            </article>
+            <article class="canvas-card">
+              <span class="idx">03</span>
+              <h3>无限画布</h3>
+              <p>拖动画布平移、滚轮缩放。多个节点并排跑，出片后直接下载到本地。</p>
+            </article>
+            <article class="canvas-card">
+              <span class="idx">04</span>
+              <h3>余额直连</h3>
+              <p>画布顶部实时显示余额和已用量。余额不够会当场提示，点一下就跳到充值。</p>
+            </article>
+          </div>
+
+          <div class="canvas-cta reveal">
+            <a class="button" href="/canvas/">打开画布</a>
+            <p class="canvas-hint">登录后即可使用，不需要另外配置 Key。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 能力 ───────────────────────────────────────── -->
+      <section id="ability" class="block" aria-labelledby="ability-title">
+        <div class="wrap">
+          <div class="section-head">
+            <h2 id="ability-title">三种出片方式</h2>
+            <p class="section-sub">给多少参考，决定你控制到什么程度。</p>
+          </div>
+          <ol class="caps reveal">
+            <li>
+              <span class="idx">01</span>
+              <h3>纯文字</h3>
+              <p>只写文案，让模型自己安排镜头、光线和运镜。</p>
+            </li>
+            <li>
+              <span class="idx">02</span>
+              <h3>单图定主体</h3>
+              <p>放一张图锁住人或物，再用文字说明它怎么动。</p>
+            </li>
+            <li>
+              <span class="idx">03</span>
+              <h3>多图参考</h3>
+              <p>最多十张参考图加文案，风格、场景、角色一并对齐。</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ── 定价 ───────────────────────────────────────── -->
+      <section id="pricing" class="block" aria-labelledby="price-title">
+        <div class="wrap">
+          <div class="section-head">
+            <h2 id="price-title">定价</h2>
+            <p class="section-sub">没有套餐、没有订阅，用多少算多少。</p>
+          </div>
+          <div class="price-card reveal">
+            <div class="price-card-main">
+              <p class="price-line"><span class="num">¥0.05</span><span class="unit">/ 秒</span></p>
+              <p class="price-note">任务按实际时长结算。5 秒 ¥0.25，10 秒 ¥0.50。</p>
+            </div>
+            <ul class="price-list">
+              <li>对外只此一个模型：<code>muse-video</code></li>
+              <li>支持 16:9、9:16、1:1</li>
+              <li>生图模型 <code>muse-image</code> 同账号可用</li>
+            </ul>
+            <a class="button" href="/sign-up">开始使用</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 常见问题 ───────────────────────────────────── -->
+      <section id="faq" class="block" aria-labelledby="faq-title">
+        <div class="wrap">
+          <div class="section-head">
+            <h2 id="faq-title">常见问题</h2>
+          </div>
+          <div class="faq reveal">
+            <details>
+              <summary>不会写代码也能用吗？</summary>
+              <p>可以。直接用<a href="/canvas/">在线画布</a>，拖节点、填提示词就行，不需要碰接口。</p>
+            </details>
+            <details>
+              <summary>一段视频要等多久？</summary>
+              <p>任务排队后一般一到几分钟，画布和接口都会返回进度，最长等待 20 分钟。</p>
+            </details>
+            <details>
+              <summary>支持多大分辨率？</summary>
+              <p>目前提供 16:9、9:16、1:1 三种画幅，成片为高清质量，时长常用 5 秒或 10 秒。</p>
+            </details>
+            <details>
+              <summary>能指定时长吗？</summary>
+              <p>可以。画布上直接选 5 秒或 10 秒，按实际时长计费。</p>
+            </details>
+            <details>
+              <summary>失败会扣钱吗？</summary>
+              <p>不会。生成失败的任务不扣额度，异常时会给出具体原因。</p>
+            </details>
+            <details>
+              <summary>能接到自己的程序里吗？</summary>
+              <p>可以。接口是 OpenAI 兼容风格，也可以导出 <a href="/providers/lingyuai.ts">provider 模板</a> 集成到自己的工具。</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 收尾 ───────────────────────────────────────── -->
+      <section class="cta">
+        <div class="wrap cta-inner">
+          <h2>先跑一条，再决定。</h2>
+          <p>注册就能拿到 Key，充多少用多少。</p>
+          <a class="button button-invert" href="/sign-up">免费注册</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-grid">
+        <div>
+          <a class="word" href="/">灵域AI</a>
+          <p>Muse 视频 · ¥0.05/秒</p>
+        </div>
+        <div>
+          <h2>站点</h2>
+          <p>联系：待补充</p>
+        </div>
+        <div>
+          <h2>账户</h2>
+          <p><a href="/sign-up">注册</a> · <a href="/sign-in">登录</a></p>
+          <p><a href="/terms">服务条款</a>（占位稿）</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/js/site.js?v=9"></script>
+  </body>
+</html>
